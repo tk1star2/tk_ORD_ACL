@@ -164,6 +164,11 @@ TopNPredictionsAccessor::TopNPredictionsAccessor(const std::string &labels_path,
 template <typename T>
 void TopNPredictionsAccessor::access_predictions_tensor(ITensor &tensor)
 {
+    //---------------------------------tk----------------------------
+    // let's get probabilities as for object detction!
+
+
+
     // Get the predicted class
     std::vector<T>      classes_prob;
     std::vector<size_t> index;

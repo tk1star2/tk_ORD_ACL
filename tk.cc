@@ -21,6 +21,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+#include <iostream>
+#include <fstream>
 #include "arm_compute/graph/Graph.h"
 #include "arm_compute/graph/Nodes.h"
 #include "arm_compute/graph/SubGraph.h"
@@ -28,8 +30,6 @@
 #include "utils/GraphUtils.h"
 #include "utils/Utils.h"
 #include "arm_compute/runtime/CL/CLScheduler.h"
-#include "arm_compute/
-
 
 using namespace arm_compute::utils; 		//utils/Utils.h
 using namespace arm_compute::graph; 		//graph/Graph.h
@@ -58,6 +58,8 @@ public:
         std::string data_path; /* Path to the trainable data */
         std::string image;     /* Image data */
         std::string label;     /* Label data */
+	std::ofstream output_path("./tk.txt", std::ios::out);
+
         ConvolutionMethodHint convolution_hint;
         arm_compute::DataType type;
 
@@ -145,10 +147,20 @@ public:
     	    }
 	    std::cout << "2\n";
     	    std::string dtype = argv[6];
+
+	    //note The tensor data type for the inputs must be U8/QS8/QS16/S16/F16/F32.
     	    if (dtype == "float32") {
     	        type = DataType::F32;
-    	    } else {
-    	        type = DataType::F16;
+    	    } else if(dtype == "float16"){
+		type = DataType::F16;
+	    } else if(dtype == "uint8"){
+		type = DataType::U8;
+	    } else if(dtype == "fixed16"){
+		type = DataType::QS16;
+	    } else if(dtype == "fixed8"){
+		type = DataType::QS8;
+	    } else {
+    	        type = DataType::S16;
     	    }
         }
    	std::cout << "okay input is okay\n";
@@ -270,7 +282,7 @@ public:
 		  //--------------------------------------------------------------------------
               << FlattenLayer()
               << SoftmaxLayer()
-              << Tensor(get_output_accessor(label, 5));
+              << Tensor(get_output_accessor(label, 5, output_path));
 	      //<< ReshapeLayer(TensorShape(72U))
 	      //<< Tensor(TensorInfo(TensorShape(72U), 
 
